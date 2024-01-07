@@ -1,0 +1,125 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Payroll API",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/time_tracking/upload": {
+      "post": {
+        "summary": "Upload CSV",
+        "description": "Upload CSV file with time tracking by employee.Tthe file name should be of the format time-report-x.csv, where x is the ID of the time report represented as an integer. For example, time-report-42.csv would represent a report with an ID of 42. ",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        }
+      }
+    },
+    "/payroll/report": {
+      "get": {
+        "summary": "Get payroll report",
+        "description": "Get payroll report by customer and payment period",
+        "responses": {
+          "200": {
+            "description": "Payroll Report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/payrollReport"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "employeeReports": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/employeeReport"
+        }
+      },
+      "employeeReport": {
+        "required": [
+          "employeeId",
+          "amountPaid",
+          "payPeriod"
+        ],
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "example": "1",
+            "description": "Employee ID"
+          },
+          "amountPaid": {
+            "type": "number",
+            "example": "75.6",
+            "description": "Payroll amount for period"
+          },
+          "payPeriod": {
+            "type": "object",
+            "description": "Period of months",
+            "required": [
+              "startDate",
+              "endDate"
+            ],
+            "properties": {
+              "startDate": {
+                "type": "string",
+                "example": "2023-01-01",
+                "description": "Payment period start date"
+              },
+              "endDate": {
+                "type": "string",
+                "example": "2023-01-15",
+                "description": "Payment period end date"
+              }
+            }
+          }
+        }
+      },
+      "payrollReport": {
+        "type": "object",
+        "properties": {
+          "employeeReports": {
+            "$ref": "#/components/schemas/employeeReports"
+
+          }
+        }
+      }
+    }
+  }
+}
